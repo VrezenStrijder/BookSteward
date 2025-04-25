@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net8.0-windows7.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<UseWPF>true</UseWPF>
+
+		<Product>图书管理员(BookSteward)</Product>
+		<Authors>@VrezenStrijder</Authors>
+		<Copyright>Copyright © 2025 @VrezenStrijder. All rights reserved.</Copyright>
+		<AssemblyTitle>BookSteward</AssemblyTitle>
+		<Version>1.0.0</Version>
+		<ApplicationIcon>Resources\book_64.ico</ApplicationIcon>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Remove="Converters\UsingConverters.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="Resources\book_64.ico" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+		<PackageReference Include="FluentIcons.Common" Version="1.1.293" />
+		<PackageReference Include="FluentIcons.WPF" Version="1.1.293" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.4">
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.4" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.4" />
+		<PackageReference Include="Ookii.Dialogs.Wpf" Version="5.0.1" />
+		<PackageReference Include="Serilog" Version="4.2.0" />
+		<PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+		<PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
+	</ItemGroup>
+
+</Project>
