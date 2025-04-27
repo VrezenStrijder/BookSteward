@@ -20,6 +20,8 @@ namespace BookSteward.Models
 
         public int? PublicationYear { get; set; }
 
+        public string? Isbn { get; set; }
+
         [Required]
         public string FilePath { get; set; } = string.Empty; 
 
@@ -38,6 +40,5 @@ namespace BookSteward.Models
         public List<Tag> Tags { get; set; } = new List<Tag>();
 
         // public string CoverImagePath { get; set; }
-        // public string Isbn { get; set; }
     }
 }

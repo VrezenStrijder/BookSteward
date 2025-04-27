@@ -92,23 +92,32 @@ namespace BookSteward.Services
 
             return defaultCategory;
         }
-        
+
         public async Task<Category> UpdateCategoryBooksAsync(int categoryId, List<Book> books)
         {
-            var category = await context.Categories
-                .Include(c => c.Books)
-                .FirstOrDefaultAsync(c => c.Id == categoryId);
-                
+            var categories = await context.Categories.Include(c => c.Books).ToListAsync();
+            var category = categories.FirstOrDefault(c => c.Id == categoryId);
+
+            //var category = await context.Categories
+            //    .Include(c => c.Books)
+            //    .FirstOrDefaultAsync(c => c.Id == categoryId);
+
             if (category == null)
+            {
                 throw new ArgumentException($"分类ID {categoryId} 不存在");
-                
+            }
+
             // 清空并重新添加书籍
             category.Books.Clear();
             foreach (var book in books)
             {
+                foreach (var c in categories)
+                {
+                    c.Books.Remove(book);
+                }
                 category.Books.Add(book);
             }
-            
+
             await context.SaveChangesAsync();
             return category;
         }
