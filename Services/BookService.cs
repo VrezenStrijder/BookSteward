@@ -1,6 +1,8 @@
 using BookSteward.Data;
 using BookSteward.Models;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace BookSteward.Services;
 
@@ -15,28 +17,27 @@ public class BookService : IBookService
 
     public async Task<IEnumerable<Book>> GetAllBooksAsync()
     {
-        Log.Debug("»ñÈ¡ËùÓĞÊé¼®.");
+        Log.Debug("ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½é¼®.");
         try
         {
             return await dbContext.Books.Include(b => b.Tags).ToListAsync();
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "»ñÈ¡ËùÓĞÊé¼®Ê§°Ü.");
-            throw; 
+            Log.Error(ex, "ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½é¼®Ê§ï¿½ï¿½.");
+            throw;
         }
     }
 
     public async Task<Book?> GetBookByIdAsync(int id)
     {
-        Log.Debug("»ñÈ¡Êé¼®: {BookId}", id);
         try
         {
             return await dbContext.Books.Include(b => b.Tags).FirstOrDefaultAsync(b => b.Id == id);
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "»ñÈ¡Êé¼®: {BookId}", id);
+            Log.Error(ex, "ï¿½ï¿½È¡ï¿½é¼®Ê§ï¿½ï¿½: {BookId}", id);
             throw;
         }
     }
@@ -44,22 +45,21 @@ public class BookService : IBookService
     public async Task<Book> AddBookAsync(Book book)
     {
         if (book == null) throw new ArgumentNullException(nameof(book));
-        Log.Information("Ìí¼ÓÊé¼®: {BookTitle}", book.Title);
         try
         {
             dbContext.Books.Add(book);
             await dbContext.SaveChangesAsync();
-            Log.Information("Ìí¼ÓÊé¼® {BookId} ³É¹¦.", book.Id);
+            Log.Information("ï¿½Ñ³É¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½é¼®:  {BookId} .", book.Id);
             return book;
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "Ìí¼ÓÊé¼® {BookTitle} Ê±Ê§°Ü.", book.Title);
+            Log.Error(ex, "ï¿½ï¿½ï¿½ï¿½ï¿½é¼® {BookTitle} Ê§ï¿½ï¿½ .", book.Title);
             throw;
         }
     }
 
-    
+
     public async Task<bool> UpdateBookAsync(Book book)
     {
         if (book == null) throw new ArgumentNullException(nameof(book));
@@ -69,24 +69,24 @@ public class BookService : IBookService
             var existingBook = await dbContext.Books.FindAsync(book.Id);
             if (existingBook == null)
             {
-                Log.Warning("²»´æÔÚIdÎª {BookId} µÄÊé¼®.", book.Id);
+                Log.Warning("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½IDÎª {BookId} ï¿½ï¿½ï¿½é¼®.", book.Id);
                 return false;
             }
 
             dbContext.Entry(existingBook).CurrentValues.SetValues(book);
 
             await dbContext.SaveChangesAsync();
-            Log.Information("¸üĞÂÊé¼® {BookId} ĞÅÏ¢³É¹¦", book.Id);
+            Log.Information("ï¿½ï¿½ï¿½ï¿½ï¿½é¼® {BookId} ï¿½É¹ï¿½.", book.Id);
             return true;
         }
         catch (DbUpdateConcurrencyException ex)
         {
-            Log.Error(ex, "¸üĞÂÊé¼® {BookId} ĞÅÏ¢Ê±·¢Éú²¢·¢´íÎó.", book.Id);
+            Log.Error(ex, "ï¿½ï¿½ï¿½ï¿½ï¿½é¼® {BookId} ï¿½ï¿½Ï¢Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½.", book.Id);
             return false;
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "¸üĞÂÊé¼® {BookId} ĞÅÏ¢Ê±·¢Éú´íÎó", book.Id);
+            Log.Error(ex, "ï¿½ï¿½ï¿½ï¿½ï¿½é¼® {BookId} ï¿½ï¿½Ï¢Ê±Ê§ï¿½ï¿½.", book.Id);
             throw;
         }
     }
@@ -98,23 +98,23 @@ public class BookService : IBookService
             var bookToDelete = await dbContext.Books.FindAsync(id);
             if (bookToDelete == null)
             {
-                Log.Warning("²»´æÔÚIdÎª {BookId} µÄÊé¼®.", id);
+                Log.Warning("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½IDÎª {BookId} ï¿½ï¿½ï¿½é¼®.", id);
                 return false;
             }
 
             dbContext.Books.Remove(bookToDelete);
             await dbContext.SaveChangesAsync();
-            Log.Information("É¾³ıÊé¼® {BookId} ³É¹¦.", id);
+            Log.Information("É¾ï¿½ï¿½ï¿½é¼® {BookId} ï¿½É¹ï¿½.", id);
             return true;
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "É¾³ıÊé¼® {BookId} Ê§°Ü.", id);
+            Log.Error(ex, "É¾ï¿½ï¿½ï¿½é¼® {BookId} Ê§ï¿½ï¿½.", id);
             throw;
         }
     }
 
-    
+
     public async Task<IEnumerable<Book>> SearchBooksAsync(string query)
     {
         if (string.IsNullOrWhiteSpace(query))
@@ -126,28 +126,220 @@ public class BookService : IBookService
 
         try
         {
-            return await dbContext.Books
+            // åˆ†ä¸¤æ­¥æ‰§è¡ŒæŸ¥è¯¢ï¼Œé¿å…å¤æ‚çš„LINQè¡¨è¾¾å¼æ— æ³•è¢«ç¿»è¯‘çš„é—®é¢˜
+            // 1. å…ˆæŸ¥è¯¢åŸºæœ¬å±æ€§åŒ¹é…çš„ä¹¦ç±
+            var basicPropertyMatches = await dbContext.Books
+                .Include(b => b.Tags)
                 .Where(b =>
                     (b.Title != null && b.Title.ToLower().Contains(lowerCaseQuery)) ||
                     (b.Author != null && b.Author.ToLower().Contains(lowerCaseQuery)) ||
                     (b.Description != null && b.Description.ToLower().Contains(lowerCaseQuery))
-                 )
+                )
                 .ToListAsync();
 
-            //return await dbContext.Books
-            //    .Include(b => b.Tags)
-            //    .Where(b =>
-            //        (b.Title != null && b.Title.ToLower().Contains(lowerCaseQuery)) ||
-            //        (b.Author != null && b.Author.ToLower().Contains(lowerCaseQuery)) ||
-            //        (b.Description != null && b.Description.ToLower().Contains(lowerCaseQuery)) || 
-            //        (b.Tags != null && b.Tags.Any(t => t.Name != null && t.Name.ToLower().Contains(lowerCaseQuery)))
-            //     )
-            //    .ToListAsync();
+            // 2. å†æŸ¥è¯¢æ ‡ç­¾åŒ¹é…çš„ä¹¦ç±
+            var tagMatches = await dbContext.Books
+                .Include(b => b.Tags)
+                .Where(b => b.Tags.Any(t => t.Name != null && t.Name.ToLower().Contains(lowerCaseQuery)))
+                .ToListAsync();
+
+            // åˆå¹¶ç»“æœå¹¶å»é‡
+            return basicPropertyMatches.Union(tagMatches).ToList();
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "ËÑË÷Êé¼®Ê§°Ü.(²éÑ¯Óï¾ä: {Query}", query);
+            Log.Error(ex, "æœç´¢ä¹¦ç±å¤±è´¥.(æŸ¥è¯¢è¯: {Query}", query);
             throw;
         }
     }
+
+    public async Task<IEnumerable<Book>> SearchBooksByTagAsync(string tagName)
+    {
+        if (string.IsNullOrWhiteSpace(tagName))
+        {
+            return await GetAllBooksAsync(); // Return all books if tag name is empty
+        }
+
+        var lowerCaseTagName = tagName.ToLower();
+
+        try
+        {
+            // Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½Ó²ï¿½Ñ¯ï¿½ï¿½ï¿½æ¸´ï¿½ÓµÄµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô²ï¿½Ñ¯
+            // ï¿½ï¿½ï¿½È²ï¿½ï¿½ï¿½Æ¥ï¿½ï¿½Ä±ï¿½Ç©
+            var matchingTagIds = await dbContext.Tags
+                .Where(t => t.Name != null && t.Name.ToLower() == lowerCaseTagName)
+                .Select(t => t.Id)
+                .ToListAsync();
+
+            if (!matchingTagIds.Any())
+            {
+                return new List<Book>(); // ï¿½ï¿½ï¿½Ã»ï¿½ï¿½Æ¥ï¿½ï¿½Ä±ï¿½Ç©ï¿½ï¿½ï¿½ï¿½ï¿½Ø¿ï¿½ï¿½Ğ±ï¿½
+            }
+
+            // È»ï¿½ï¿½ï¿½ï¿½Ò°ï¿½ï¿½ï¿½ï¿½ï¿½Ğ©ï¿½ï¿½Ç©ï¿½ï¿½ï¿½é¼®
+            return await dbContext.Books
+                .Where(b => b.Tags.Any(t => matchingTagIds.Contains(t.Id)))
+                .Include(b => b.Tags)
+                .ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "ï¿½ï¿½ï¿½ï¿½Ç©ï¿½ï¿½ï¿½ï¿½ï¿½é¼®Ê§ï¿½ï¿½.(ï¿½ï¿½Ç©ï¿½ï¿½: {TagName}", tagName);
+            throw;
+        }
+    }
+
+    public IEnumerable<Tag> GetAllTags()
+    {
+        try
+        {
+            return dbContext.Tags.ToList();
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "ï¿½ï¿½È¡ï¿½ï¿½ï¿½Ğ±ï¿½Ç©Ê§ï¿½ï¿½.");
+            throw;
+        }
+    }
+
+    public async Task<bool> RemoveTagFromBookAsync(int bookId, int tagId)
+    {
+        try
+        {
+            // ï¿½ï¿½È¡ï¿½é¼®
+            var book = await dbContext.Books
+                .Include(b => b.Tags)
+                .FirstOrDefaultAsync(b => b.Id == bookId);
+
+            if (book == null)
+            {
+                Log.Warning("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½IDÎª {BookId} ï¿½ï¿½ï¿½é¼®.", bookId);
+                return false;
+            }
+
+            // ï¿½ï¿½È¡ï¿½ï¿½Ç©
+            var tag = await dbContext.Tags.FindAsync(tagId);
+            if (tag == null)
+            {
+                Log.Warning("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½IDÎª {TagId} ï¿½Ä±ï¿½Ç©.", tagId);
+                return false;
+            }
+
+            // ï¿½Æ³ï¿½ï¿½é¼®ï¿½ï¿½ï¿½Ç©ï¿½Ä¹ï¿½ï¿½ï¿½
+            if (book.Tags.Any(t => t.Id == tagId))
+            {
+                book.Tags.Remove(tag);
+                await dbContext.SaveChangesAsync();
+                Log.Information("ï¿½Ñ´ï¿½ï¿½é¼® {BookId} ï¿½Æ³ï¿½ï¿½ï¿½Ç© {TagId}", bookId, tagId);
+                return true;
+            }
+
+            return false;
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "ï¿½ï¿½ï¿½é¼® {BookId} ï¿½Æ³ï¿½ï¿½ï¿½Ç© {TagId} Ê§ï¿½ï¿½", bookId, tagId);
+            throw;
+        }
+    }
+
+    public async Task<bool> DeleteTagAsync(int tagId)
+    {
+        try
+        {
+            // ï¿½ï¿½È¡ï¿½ï¿½Ç©
+            var tag = await dbContext.Tags
+                .Include(t => t.Books)
+                .FirstOrDefaultAsync(t => t.Id == tagId);
+
+            if (tag == null)
+            {
+                Log.Warning("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½IDÎª {TagId} ï¿½Ä±ï¿½Ç©.", tagId);
+                return false;
+            }
+
+            // ï¿½Æ³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½é¼®ï¿½ï¿½Ã±ï¿½Ç©ï¿½Ä¹ï¿½ï¿½ï¿½
+            foreach (var book in tag.Books.ToList())
+            {
+                book.Tags.Remove(tag);
+            }
+
+            // É¾ï¿½ï¿½ï¿½ï¿½Ç©
+            dbContext.Tags.Remove(tag);
+            await dbContext.SaveChangesAsync();
+            Log.Information("ï¿½ï¿½É¾ï¿½ï¿½ï¿½ï¿½Ç© {TagId} ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ğ¹ï¿½ï¿½ï¿½", tagId);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "É¾ï¿½ï¿½ï¿½ï¿½Ç© {TagId} Ê§ï¿½ï¿½", tagId);
+            throw;
+        }
+    }
+
+    public async Task AddTagsToBooksAsync(List<int> bookIds, List<string> tagNames)
+    {
+        if (bookIds == null || !bookIds.Any())
+        {
+            throw new ArgumentException("ï¿½é¼®IDï¿½Ğ±ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½", nameof(bookIds));
+        }
+
+        if (tagNames == null || !tagNames.Any())
+        {
+            throw new ArgumentException("ï¿½ï¿½Ç©ï¿½ï¿½ï¿½ï¿½ï¿½Ğ±ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½", nameof(tagNames));
+        }
+
+        try
+        {
+            // ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½é¼®
+            var books = await dbContext.Books
+                .Include(b => b.Tags)
+                .Where(b => bookIds.Contains(b.Id))
+                .ToListAsync();
+
+            if (!books.Any())
+            {
+                Log.Warning("Î´ï¿½Òµï¿½Ö¸ï¿½ï¿½IDï¿½ï¿½ï¿½é¼®: {BookIds}", string.Join(", ", bookIds));
+                return;
+            }
+
+            // ï¿½ï¿½ï¿½ï¿½Ã¿ï¿½ï¿½ï¿½ï¿½Ç©
+            foreach (var tagName in tagNames)
+            {
+                if (string.IsNullOrWhiteSpace(tagName))
+                {
+                    continue;
+                }
+
+                // ï¿½ï¿½ï¿½Ò»ò´´½ï¿½ï¿½ï¿½Ç©
+                var tag = await dbContext.Tags.FirstOrDefaultAsync(t => t.Name.ToLower() == tagName.ToLower());
+                if (tag == null)
+                {
+                    tag = new Tag { Name = tagName };
+                    dbContext.Tags.Add(tag);
+                    await dbContext.SaveChangesAsync();
+                }
+
+                // ÎªÃ¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó±ï¿½Ç©
+                foreach (var book in books)
+                {
+                    // ï¿½ï¿½ï¿½ï¿½é¼®ï¿½Ç·ï¿½ï¿½ï¿½ï¿½Ğ´Ë±ï¿½Ç©
+                    if (!book.Tags.Any(t => t.Id == tag.Id))
+                    {
+                        book.Tags.Add(tag);
+                    }
+                }
+            }
+
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+            await dbContext.SaveChangesAsync();
+            Log.Information("ï¿½É¹ï¿½Îª {BookCount} ï¿½ï¿½ï¿½é¼®ï¿½ï¿½ï¿½ï¿½ {TagCount} ï¿½ï¿½ï¿½ï¿½Ç©", books.Count, tagNames.Count);
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Îªï¿½é¼®ï¿½ï¿½ï¿½Ó±ï¿½Ç©Ê§ï¿½ï¿½");
+            throw;
+        }
+    }
+
 }
